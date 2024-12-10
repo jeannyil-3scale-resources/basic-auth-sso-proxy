@@ -13,8 +13,6 @@ import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.model.RouteDefinition;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 
-import io.vertx.core.http.HttpHeaders;
-
 @ApplicationScoped
 public class BasicAuthSSOProxyRoute extends RouteBuilder {
 
@@ -48,8 +46,6 @@ public class BasicAuthSSOProxyRoute extends RouteBuilder {
             .log(LoggingLevel.INFO, logName, "Incoming headers: ${headers}")
             // Extract username and password from Basic Auth header
             .process("basicAuthProcessor")
-            // Remove the incoming Authorization HTTP header
-            .removeHeader(HttpHeaders.AUTHORIZATION.toString())
             // Obtain OIDC Access Token using password grant and replace Authorization header with this OIDC access token as a Bearer token
             .process("oidcAccessTokenProcessor")
             .log(LoggingLevel.INFO, logName, "Headers propagated to the backend: ${headers}")
