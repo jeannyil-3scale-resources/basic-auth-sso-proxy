@@ -131,7 +131,7 @@ quarkus:
       # that should be registered for reflection.
       # Reference: https://camel.apache.org/camel-quarkus/latest/user-guide/native-mode.html#reflection
       reflection:
-        include-patterns: java.lang.Exception
+        include-patterns: java.lang.Exception,java.lang.IllegalArgumentException,io.quarkus.oidc.client.OidcClientException
 
   # Quarkus log
   log:
