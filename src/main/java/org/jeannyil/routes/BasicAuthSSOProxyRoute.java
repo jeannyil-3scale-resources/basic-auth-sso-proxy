@@ -25,10 +25,10 @@ public class BasicAuthSSOProxyRoute extends RouteBuilder {
 
     @Override
     public void configure() throws Exception {
-
+        
         // Catch unexpected exceptions
-		onException(java.lang.Exception.class)
-            .handled(false)
+        onException(java.lang.Exception.class)
+            .handled(true)
             .maximumRedeliveries(0)
             .log(LoggingLevel.ERROR, logName, ">>> ${routeId} - Caught exception: ${exception.stacktrace}")
             .to(DirectEndpointConstants.DIRECT_GENERATE_ERROR_MESSAGE)
@@ -36,7 +36,7 @@ public class BasicAuthSSOProxyRoute extends RouteBuilder {
 
         // OIDC Client and IllegalArgument Exceptions
         onException(io.quarkus.oidc.client.OidcClientException.class, java.lang.IllegalArgumentException.class)
-            .handled(false)
+            .handled(true)
             .maximumRedeliveries(0)
             .log(LoggingLevel.ERROR, logName, ">>> ${routeId} - Caught exception: ${exception.stacktrace}")
             .setHeader(Exchange.HTTP_RESPONSE_CODE, constant(Response.Status.UNAUTHORIZED.getStatusCode()))

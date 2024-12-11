@@ -43,7 +43,7 @@ public class GenerateErrorResponseRoute extends RouteBuilder {
 			.end()
 			.marshal().json(JsonLibrary.Jackson, true)
 			.convertBodyTo(String.class)
-			.log(LoggingLevel.INFO, logName, ">>> ${routeId} - OUT: headers:[${headers}] - body:[${body}]")
+			.log(LoggingLevel.ERROR, logName, ">>> ${routeId} - OUT: headers:[${headers}] - body:[${body}]")
 		;
 		
 	}
