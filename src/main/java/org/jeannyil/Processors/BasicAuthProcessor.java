@@ -1,7 +1,8 @@
-package org.jeannyil.Processors;
+package org.jeannyil.processors;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Named;
+import jakarta.ws.rs.core.Response;
 
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
@@ -20,6 +21,8 @@ public class BasicAuthProcessor implements Processor {
         // Get the Authorization header
         String authHeader = exchange.getIn().getHeader("Authorization", String.class);
         if (authHeader == null || !authHeader.startsWith("Basic ")) {
+            exchange.getMessage().setHeader(Exchange.HTTP_RESPONSE_CODE, Response.Status.UNAUTHORIZED.getStatusCode());
+            exchange.getMessage().setHeader(Exchange.HTTP_RESPONSE_TEXT, Response.Status.UNAUTHORIZED.getReasonPhrase());
             throw new IllegalArgumentException("Missing or invalid Authorization header for Basic Auth");
         }
 
@@ -30,6 +33,8 @@ public class BasicAuthProcessor implements Processor {
         // Split the credentials into username and password
         String[] parts = credentials.split(":", 2);
         if (parts.length != 2) {
+            exchange.getMessage().setHeader(Exchange.HTTP_RESPONSE_CODE, Response.Status.UNAUTHORIZED.getStatusCode());
+            exchange.getMessage().setHeader(Exchange.HTTP_RESPONSE_TEXT, Response.Status.UNAUTHORIZED.getReasonPhrase());
             throw new IllegalArgumentException("Invalid Basic Auth credentials format");
         }
 

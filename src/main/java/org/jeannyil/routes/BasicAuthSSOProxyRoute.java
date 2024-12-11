@@ -6,12 +6,14 @@ import java.nio.file.Path;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Named;
+import jakarta.ws.rs.core.Response;
 
 import org.apache.camel.Exchange;
 import org.apache.camel.LoggingLevel;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.model.RouteDefinition;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
+import org.jeannyil.constants.DirectEndpointConstants;
 
 @ApplicationScoped
 public class BasicAuthSSOProxyRoute extends RouteBuilder {
@@ -29,6 +31,17 @@ public class BasicAuthSSOProxyRoute extends RouteBuilder {
             .handled(false)
             .maximumRedeliveries(0)
             .log(LoggingLevel.ERROR, logName, ">>> ${routeId} - Caught exception: ${exception.stacktrace}")
+            .to(DirectEndpointConstants.DIRECT_GENERATE_ERROR_MESSAGE)
+        ;
+
+        // OIDC Client and IllegalArgument Exceptions
+        onException(io.quarkus.oidc.client.OidcClientException.class, java.lang.IllegalArgumentException.class)
+            .handled(false)
+            .maximumRedeliveries(0)
+            .log(LoggingLevel.ERROR, logName, ">>> ${routeId} - Caught exception: ${exception.stacktrace}")
+            .setHeader(Exchange.HTTP_RESPONSE_CODE, constant(Response.Status.UNAUTHORIZED.getStatusCode()))
+            .setHeader(Exchange.HTTP_RESPONSE_TEXT, constant(Response.Status.UNAUTHORIZED.getReasonPhrase()))
+            .to(DirectEndpointConstants.DIRECT_GENERATE_ERROR_MESSAGE)
         ;
 
         final RouteDefinition from;

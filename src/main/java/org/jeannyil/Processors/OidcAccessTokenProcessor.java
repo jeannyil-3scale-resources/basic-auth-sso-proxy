@@ -1,8 +1,9 @@
-package org.jeannyil.Processors;
+package org.jeannyil.processors;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
+import jakarta.ws.rs.core.Response;
 
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
@@ -34,7 +35,9 @@ public class OidcAccessTokenProcessor implements Processor {
         String password = exchange.getProperty("password", String.class);
 
         if (username == null || password == null) {
-            throw new IllegalArgumentException("Username and password must be set in Exchange properties");
+            exchange.getMessage().setHeader(Exchange.HTTP_RESPONSE_CODE, Response.Status.UNAUTHORIZED.getStatusCode());
+            exchange.getMessage().setHeader(Exchange.HTTP_RESPONSE_TEXT, Response.Status.UNAUTHORIZED.getReasonPhrase());
+            throw new IllegalArgumentException("Username or password are missing in Basic Auth credentials");
         }
 
         // Generate a cache key based on username and password
@@ -52,6 +55,6 @@ public class OidcAccessTokenProcessor implements Processor {
         }
 
         // Set the Authorization header with the cached or refreshed access token
-        exchange.getIn().setHeader(HttpHeaders.AUTHORIZATION.toString(), "Bearer " + tokens.getAccessToken());
+        exchange.getMessage().setHeader(HttpHeaders.AUTHORIZATION.toString(), "Bearer " + tokens.getAccessToken());
     }
 }
