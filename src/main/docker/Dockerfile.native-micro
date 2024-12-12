@@ -10,11 +10,11 @@
 #
 # Then, build the image with:
 #
-# docker build -f src/main/docker/Dockerfile.native-micro -t quarkus/basic-auth-sso-service .
+# docker build -f src/main/docker/Dockerfile.native-micro -t quarkus/basic-auth-sso-proxy .
 #
 # Then run the container using:
 #
-# docker run -i --rm -p 8080:8080 quarkus/basic-auth-sso-service
+# docker run -i --rm -p 8080:8080 quarkus/basic-auth-sso-proxy
 #
 ###
 FROM quay.io/quarkus/quarkus-micro-image:2.0

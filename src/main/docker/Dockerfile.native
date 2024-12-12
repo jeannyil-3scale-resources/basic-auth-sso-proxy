@@ -7,11 +7,11 @@
 #
 # Then, build the image with:
 #
-# docker build -f src/main/docker/Dockerfile.native -t quarkus/basic-auth-sso-service .
+# docker build -f src/main/docker/Dockerfile.native -t quarkus/basic-auth-sso-proxy .
 #
 # Then run the container using:
 #
-# docker run -i --rm -p 8080:8080 quarkus/basic-auth-sso-service
+# docker run -i --rm -p 8080:8080 quarkus/basic-auth-sso-proxy
 #
 ###
 FROM registry.access.redhat.com/ubi8/ubi-minimal:8.10

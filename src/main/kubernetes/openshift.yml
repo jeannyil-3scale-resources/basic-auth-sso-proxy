@@ -2,7 +2,7 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: basic-auth-sso-service-config
+  name: basic-auth-sso-proxy-config
 data:
   basic-auth-sso-proxy.port.nonsecure: '9090'
   basic-auth-sso-proxy.port.secure: '9443'
@@ -11,11 +11,11 @@ data:
 apiVersion: v1
 kind: Secret
 metadata:
-  name: basic-auth-sso-service-secret
+  name: basic-auth-sso-proxy-secret
 stringData:
   basic-auth-sso-proxy.keystore.passphrase: P@ssw0rd
   quarkus.oidc-client.auth-server-url: https://sso.apps.ocp4.jnyilimb.eu/realms/demo
-  quarkus.oidc-client.client-id: basic-auth-sso-service
+  quarkus.oidc-client.client-id: basic-auth-sso-proxy
   quarkus.oidc-client.credentials.secret: qu1mbgiQMbghPrQNGZhV4DPn16Oyp6S4
   quarkus.otel.exporter.otlp.traces.endpoint: http://tempo-simple-distributor.observability.svc:4317
 type: Opaque
