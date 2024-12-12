@@ -179,7 +179,7 @@ Below is a sample screenshot of the [_Camel Service_](https://access.redhat.com/
 
 ![APIcast Camel Service Policy](./images/CamelServicePolicy.png)
 
-Below is a sample test where you can notice the `Authorization` HTTP header has been updated with the retrieved OpenID Connect access token (`HTTP_AUTHORIZATION` header in the `Echo API` response):
+Below is a sample test where you can notice the `Authorization` HTTP header has been enriched with the retrieved OpenID Connect access token (`HTTP_AUTHORIZATION` header in the `Echo API` response):
 
 ```shell
 http -v -a JiJi https://echo-api-v2-apim-demo-apicast-production.apps.ocp4.jnyilimb.eu/v2/echo/demo
