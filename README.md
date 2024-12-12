@@ -1,10 +1,14 @@
-# basic-auth-sso-service
+# basic-auth-sso-proxy
 
 This project leverages **Red Hat build of Quarkus 3.15.x**, the Supersonic Subatomic Java Framework. More specifically, the project is implemented using [**Red Hat build of Apache Camel v4.8.x for Quarkus**](https://access.redhat.com/documentation/en-us/red_hat_build_of_apache_camel).
 
-_Basic Auth SSO Service_ is a camel proxy service that can be leveraged to configure the [_Red Hat 3scale APIcast Camel Service policy_](https://access.redhat.com/documentation/en-us/red_hat_3scale_api_management/2.12/html/administering_the_api_gateway/APIcast-policies#camel-service_standard-policies). 
+_Basic Auth SSO Proxy_ is a camel proxy service that can be leveraged to configure the [_Red Hat 3scale APIcast Camel Service policy_](https://access.redhat.com/documentation/en-us/red_hat_3scale_api_management/2.12/html/administering_the_api_gateway/APIcast-policies#camel-service_standard-policies). 
 
-_Basic Auth SSO Service_ is a proxy service that extracts the username and password from the incoming HTTP request's Basic Authentication header. It uses these credentials to obtain an OIDC access token from the _Red Hat build of Keycloak_ server via the *Resource Owner Password Credentials Grant* (commonly known as the *password grant*). The acquired OIDC access token is then inserted into the *Authorization* HTTP header as a Bearer token before forwarding the request to the upstream backend service.
+_Basic Auth SSO Proxy_ service extracts the username and password from the incoming HTTP request's Basic Authentication header. It uses these credentials to obtain an OIDC access token from the _Red Hat build of Keycloak_ server via the *Resource Owner Password Credentials Grant* (commonly known as the *password grant*). The acquired OIDC access token is then inserted into the *Authorization* HTTP header as a Bearer token before forwarding the request to the upstream backend service.
+
+Here is the overall flow sequence diagram:
+
+![Flow Sequence Diagram](./images/sequence-diagram.png)
 
 ## O. Prerequisites
 
@@ -12,16 +16,16 @@ _Basic Auth SSO Service_ is a proxy service that extracts the username and passw
 - JDK 21 installed with `JAVA_HOME` configured appropriately
 - A running [_Red Hat build of Keycloak_](https://access.redhat.com/documentation/en-us/red_hat_build_of_keycloak) instance with a set of test users (local DB or federated). The following must be configured:
     1. A confidential client with the following characteristics:
-        - Client ID: `basic-auth-sso-service`
+        - Client ID: `basic-auth-sso-proxy`
         - Client Protocol: `openid-connect`
         - Client authentication: `on`
         - Authentication flow: `Direct access grants (password grant)`
     2. Replace the `client secret` in:
         - `quarkus.oidc-client.credentials.secret` property in the [`application.yml`](./src/main/resources/application.yml) file
-        - `quarkus.oidc-client.credentials.secret` property of the `basic-auth-sso-service-secret` in the [`openshift.yml`](./src/main/kubernetes/openshift.yml) file
+        - `quarkus.oidc-client.credentials.secret` property of the `basic-auth-sso-proxy-secret` in the [`openshift.yml`](./src/main/kubernetes/openshift.yml) file
     3. Replace the `OIDC authorization server URL` in:
         - `quarkus.oidc-client.auth-server-url`  property in the [`application.yml`](./src/main/resources/application.yml) file
-        - `quarkus.oidc-client.auth-server-url` property of the `basic-auth-sso-service-secret` in the [`openshift.yml`](./src/main/kubernetes/openshift.yml) file
+        - `quarkus.oidc-client.auth-server-url` property of the `basic-auth-sso-proxy-secret` in the [`openshift.yml`](./src/main/kubernetes/openshift.yml) file
 - A running [_Red Hat OpenShift_](https://access.redhat.com/documentation/en-us/openshift_container_platform) cluster
 - A running [_Red Hat 3scale API Management_](https://access.redhat.com/documentation/en-us/red_hat_3scale_api_management) platform
 
@@ -29,10 +33,10 @@ _Basic Auth SSO Service_ is a proxy service that extracts the username and passw
 ## 1. Generate a Java Keystore
 
 ```shell
-keytool -genkey -keypass P@ssw0rd -storepass P@ssw0rd -alias basic-auth-sso-service -keyalg RSA \
--dname "CN=basic-auth-sso-service" \
+keytool -genkey -keypass P@ssw0rd -storepass P@ssw0rd -alias basic-auth-sso-proxy -keyalg RSA \
+-dname "CN=basic-auth-sso-proxy" \
 -validity 3600 -keystore ./tls-keys/keystore.p12 -v \
--ext san=DNS:basic-auth-sso-service.svc,DNS:basic-auth-sso-service.svc.cluster.local,DNS:basic-auth-sso-service.camel-quarkus.svc,DNS:basic-auth-sso-service.camel-quarkus.svc.cluster.local,DNS:basic-auth-sso-service.ceq-services-jvm.svc,DNS:basic-auth-sso-service.ceq-services-jvm.svc.cluster.local,DNS:basic-auth-sso-service.ceq-services-native.svc,DNS:basic-auth-sso-service.ceq-services-native.svc.cluster.local
+-ext san=DNS:basic-auth-sso-proxy.svc,DNS:basic-auth-sso-proxy.svc.cluster.local,DNS:basic-auth-sso-proxy.camel-quarkus.svc,DNS:basic-auth-sso-proxy.camel-quarkus.svc.cluster.local,DNS:basic-auth-sso-proxy.ceq-services-jvm.svc,DNS:basic-auth-sso-proxy.ceq-services-jvm.svc.cluster.local,DNS:basic-auth-sso-proxy.ceq-services-native.svc,DNS:basic-auth-sso-proxy.ceq-services-native.svc.cluster.local
 ```
 
 ## 2. Running the application in dev mode
@@ -70,7 +74,7 @@ You can run your application in dev mode that enables live coding using:
     ./mvnw package -Pnative -Dquarkus.native.container-build=true
     ```
 
-    You can then execute your native executable with: `./target/basic-auth-sso-service-1.0.0-SNAPSHOT-runner`
+    You can then execute your native executable with: `./target/basic-auth-sso-proxy-1.0.0-SNAPSHOT-runner`
 
     If you want to learn more about building native executables, please consult https://quarkus.io/guides/maven-tooling.
 
@@ -111,10 +115,10 @@ You can run your application in dev mode that enables live coding using:
     ```
 3. Create secret containing the keystore
     ```shell
-    oc create secret generic basic-auth-sso-service-keystore-secret \
+    oc create secret generic basic-auth-sso-proxy-keystore-secret \
     --from-file=keystore.p12=./tls-keys/keystore.p12
     ```
-4. Adjust the `quarkus.otel.exporter.otlp.traces.endpoint` property of the `basic-auth-sso-service-secret` in the [`openshift.yml`](./src/main/kubernetes/openshift.yml) file according to your OpenShift environment and where you installed the [_Jaeger_](https://www.jaegertracing.io/) server.
+4. Adjust the `quarkus.otel.exporter.otlp.traces.endpoint` property of the `basic-auth-sso-proxy-secret` in the [`openshift.yml`](./src/main/kubernetes/openshift.yml) file according to your OpenShift environment and where you installed the [_Jaeger_](https://www.jaegertracing.io/) server.
 5. Package and deploy to OpenShift
     ```shell
     ./mvnw clean package -Dquarkus.openshift.deploy=true -Dquarkus.container-image.group=ceq-services-jvm
@@ -135,10 +139,10 @@ You can run your application in dev mode that enables live coding using:
     ```
 3. Create secret containing the keystore
     ```shell
-    oc create secret generic basic-auth-sso-service-keystore-secret \
+    oc create secret generic basic-auth-sso-proxy-keystore-secret \
     --from-file=keystore.p12=./tls-keys/keystore.p12
     ```
-4. Adjust the `quarkus.otel.exporter.otlp.traces.endpoint` property of the `basic-auth-sso-service-secret` in the [`openshift.yml`](./src/main/kubernetes/openshift.yml) file according to your OpenShift environment and where you installed the [_Jaeger_](https://www.jaegertracing.io/) server.
+4. Adjust the `quarkus.otel.exporter.otlp.traces.endpoint` property of the `basic-auth-sso-proxy-secret` in the [`openshift.yml`](./src/main/kubernetes/openshift.yml) file according to your OpenShift environment and where you installed the [_Jaeger_](https://www.jaegertracing.io/) server.
 5. Package and deploy to OpenShift
     -  Using podman to build the native binary:
         ```shell
