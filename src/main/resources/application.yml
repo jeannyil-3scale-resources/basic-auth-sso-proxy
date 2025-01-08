@@ -45,15 +45,20 @@ quarkus:
     jvm-dockerfile: src/main/docker/Dockerfile.jvm
     # The default Dockerfile to use for native builds
     native-dockerfile: src/main/docker/Dockerfile.native
+    # The ports that the application listens on
     ports:
       # Allows the proxy ports to be included in the generated resources (DeploymentConfig and Service)
       proxy:
         container-port: ${basic-auth-sso-proxy.port.nonsecure}
       proxy-secure:
         container-port: ${basic-auth-sso-proxy.port.secure}
-      # Requirement of "hawtio-enabled" deployments. A container needsto have a port named "jolokia"
+      # Requirement of "hawtio-enabled" deployments. A container needs to have a port named "jolokia"
       jolokia:
-        container-port: 8778
+        container-port: ${jolokia.port}
+    # Enable the jolokia java-agent on the quarkus application
+    env:
+      vars:
+        JAVA_OPTS_APPEND: -javaagent:lib/main/org.jolokia.jolokia-agent-jvm-${jolokia.version}-javaagent.jar=protocol=${jolokia.protocol},host=${jolokia.host},port=${jolokia.port},useSslClientAuthentication=${jolokia.useSslClientAuthentication},caCert=${jolokia.caCert},clientPrincipal.1=${jolokia.clientPrincipal.1},extendedClientCheck=${jolokia.extendedClientCheck},discoveryEnabled=${jolokia.discoveryEnabled}
     # The number of desired pods
     replicas: 1
     # Expose OpenShift route
