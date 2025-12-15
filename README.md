@@ -167,7 +167,7 @@ You can run your application in dev mode that enables live coding using:
     - _**With invalid credentials**_ (authenticated by the remote Red Hat build of Keycloak server):
         ```shell
         AUTH=$(printf 'JiJi:WrongPwd' | base64)
-        printf "GET http://localhost:9876/observe/health HTTP/1.1\r\nHost: localhost\r\nAccept: */*\r\nAuthorization: Basic $AUTH\r\nProxy-Connection: keep-alive\r\nConnection: close\r\n\r\n" | \
+        printf "GET https://echo-api.3scale.net/demo HTTP/1.1\r\nHost: echo-api.3scale.net\r\nAccept: */*\r\nAuthorization: Basic $AUTH\r\nProxy-Connection: keep-alive\r\nConnection: close\r\n\r\n" | \
         ncat --ssl localhost 9443
         ```
         ```shell
@@ -175,13 +175,13 @@ You can run your application in dev mode that enables live coding using:
         content-length: 116
         Accept: */*
         Authorization: Basic SmlKaTpXcm9uZ1B3ZA==
-        traceparent: 00-e79798ac698bc9716a75049fbba125aa-68884bd73f08afdb-01
+        traceparent: 00-1f5541115030bb6676d21707c1d7a960-190ecef395718f41-01
         content-type: application/json
         connection: close
 
         {
-            "code" : 401,
-            "message" : "{\"error\":\"invalid_grant\",\"error_description\":\"Invalid user credentials\"}"
+        "code" : 401,
+        "message" : "{\"error\":\"invalid_grant\",\"error_description\":\"Invalid user credentials\"}"
         }
         ```
 
