@@ -1,11 +1,9 @@
 package org.jeannyil.routes;
 
-import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
 import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.inject.Named;
 import jakarta.ws.rs.core.Response;
 
 import org.apache.camel.Exchange;
@@ -47,9 +45,10 @@ public class BasicAuthSSOProxyRoute extends RouteBuilder {
         final RouteDefinition from;
         if (Files.exists(keystorePath())) {
             from = from("netty-http:proxy://0.0.0.0:{{basic-auth-sso-proxy.port.secure}}"
-                        + "?ssl=true&keyStoreFile=#keystoreFile"
+                        + "?ssl=true"
+                        + "&keyStoreResource=file:{{basic-auth-sso-proxy.keystore.mount-path}}/keystore.p12"
                         + "&passphrase={{basic-auth-sso-proxy.keystore.passphrase}}"
-                        + "&trustStoreFile=#keystoreFile");
+                        + "&trustStoreResource=file:{{basic-auth-sso-proxy.keystore.mount-path}}/keystore.p12");
         } else {
             from = from("netty-http:proxy://0.0.0.0:{{basic-auth-sso-proxy.port.nonsecure}}");
         }
@@ -75,11 +74,6 @@ public class BasicAuthSSOProxyRoute extends RouteBuilder {
 
     Path keystorePath() {
         return Path.of(keystoreMountPath, "keystore.p12");
-    }
-
-    @Named("keystoreFile")
-    File getKeystoreFile() {
-        return keystorePath().toFile();
     }
     
 }
