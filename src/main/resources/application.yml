@@ -51,23 +51,27 @@ quarkus:
     # The build config strategy to use
     build-strategy: DOCKER
     # The default Dockerfile to use for jvm builds
-    jvm-dockerfile: src/main/docker/Dockerfile.jvm
+    # jvm-dockerfile: src/main/docker/Dockerfile.jvm
+    jvm-dockerfile: src/main/docker/Containerfile.jvm-hummingbird
     # The default Dockerfile to use for native builds
     native-dockerfile: src/main/docker/Dockerfile.native
     # Environment variables
-    env:
-      vars:
-        # Use G1GC instead of the default `-XX:+UseParallelGC` (RH build of OpenJDK image)
-        GC_CONTAINER_OPTIONS: -XX:+UseG1GC
-        # Configure JVM to facilitate diagnostics:
-        # - Enable automatic heap dump: -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/tmp/heapdump.hprof
-        # - Enable native memory (off-heap) tracking (not recommended in PRODUCTION): -XX:NativeMemoryTracking=summary
-        # - Enable Structured GC logging: -Xlog:gc*:file=/tmp/gc.log:time,level,tags:filecount=5,filesize=10m
-        JAVA_OPTS_APPEND: |
-          -XX:+HeapDumpOnOutOfMemoryError
-          -XX:HeapDumpPath=/tmp/heapdump.hprof
-          -XX:NativeMemoryTracking=summary
-          -Xlog:gc*:file=/tmp/gc.log:time,level,tags:filecount=5,filesize=10m
+    # env:
+    #   vars:
+    #     # Use G1GC instead of the default `-XX:+UseParallelGC` (RH build of OpenJDK image)
+    #     GC_CONTAINER_OPTIONS: -XX:+UseG1GC
+    #     # Configure JVM:
+    #     # - Set the number of active processors to 4 (CPU limit is intentionnaly not set): -XX:ActiveProcessorCount=4
+    #     # - Facilitate diagnostics
+    #     # -> Enable automatic heap dump: -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/tmp/heapdump.hprof
+    #     # -> Enable native memory (off-heap) tracking (not recommended in PRODUCTION): -XX:NativeMemoryTracking=summary
+    #     # -> Enable Structured GC logging: -Xlog:gc*:file=/tmp/gc.log:time,level,tags:filecount=5,filesize=10m
+    #     JAVA_OPTS_APPEND: |
+    #       -XX:ActiveProcessorCount=4
+    #       -XX:+HeapDumpOnOutOfMemoryError
+    #       -XX:HeapDumpPath=/tmp/heapdump.hprof
+    #       -XX:NativeMemoryTracking=summary
+    #       -Xlog:gc*:file=/tmp/gc.log:time,level,tags:filecount=5,filesize=10m
     # The ports that the application listens on
     ports:
       # Allows the proxy ports to be included in the generated resources (DeploymentConfig and Service)
