@@ -1,5 +1,5 @@
 # Use the Red Hat hardened OpenJDK image (Hummingbird / distroless: no shell)
-FROM registry.access.redhat.com/hi/openjdk:21.0.11-runtime
+FROM registry.access.redhat.com/hi/openjdk:21.0.12-runtime
 
 ENV LANGUAGE='en_US:en'
 
