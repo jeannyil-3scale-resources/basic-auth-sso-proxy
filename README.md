@@ -12,8 +12,8 @@ Here is the overall flow sequence diagram:
 
 ## Prerequisites
 
-- Apache Maven 3.9.9
-- JDK 21 installed with `JAVA_HOME` configured appropriately
+- Apache Maven 3.9.9+
+- JDK 25 installed with `JAVA_HOME` configured appropriately
 - A running [_Red Hat build of Keycloak_](https://access.redhat.com/documentation/en-us/red_hat_build_of_keycloak) instance with a set of test users (local DB or federated). The following must be configured:
     1. A confidential client with the following characteristics:
         - Client ID: `basic-auth-sso-proxy`
