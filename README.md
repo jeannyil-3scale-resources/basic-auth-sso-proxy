@@ -39,6 +39,8 @@ keytool -genkey -keypass P@ssw0rd -storepass P@ssw0rd -alias basic-auth-sso-prox
 -ext san=DNS:basic-auth-sso-proxy.svc,DNS:basic-auth-sso-proxy.svc.cluster.local,DNS:basic-auth-sso-proxy.camel-quarkus.svc,DNS:basic-auth-sso-proxy.camel-quarkus.svc.cluster.local,DNS:basic-auth-sso-proxy.ceq-services-jvm.svc,DNS:basic-auth-sso-proxy.ceq-services-jvm.svc.cluster.local,DNS:basic-auth-sso-proxy.ceq-services-native.svc,DNS:basic-auth-sso-proxy.ceq-services-native.svc.cluster.local
 ```
 
+> **NOTE:** `tls-keys/keystore.p12` is a **dev-only self-signed fixture** (`P@ssw0rd`, 3600d) — no longer versioned (public repo). Regenerate locally via the `keytool` command above before `oc create secret ... --from-file=keystore.p12=./tls-keys/keystore.p12`. Do not reuse in production.
+
 ## Running the application in dev mode
 
 You can run your application in dev mode that enables live coding using:
